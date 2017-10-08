@@ -1,4 +1,6 @@
 var express = require('express');
+// User compression to improve performance
+var compression = require('compression')
 var path = require('path');
 var favicon = require('serve-favicon');
 var logger = require('morgan');
@@ -7,6 +9,34 @@ var bodyParser = require('body-parser');
 
 var index = require('./routes/index');
 var users = require('./routes/users');
+
+// Require Firebase admin module
+var admin = require("firebase-admin");
+
+// Require http module
+var http = require('http');
+
+// Initialize Firebase Admin SDK
+// Fetch the service account key JSON file contents
+var serviceAccount = require("path/to/serviceAccountKey.json");
+
+// Initialize the app with a service account, granting admin privileges
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    databaseURL: "https://darren-web-90f8e.firebaseio.com"
+});
+
+// As an admin, the app has access to read and write all data, regardless of Security Rules
+var db = admin.database();
+var ref = db.ref("restricted_access/secret_document");
+ref.once("value", function(snapshot) {
+    console.log(snapshot.val());
+});
+
+// Create http server
+http.createServer(function (req, res) {
+
+});
 
 var app = express();
 
